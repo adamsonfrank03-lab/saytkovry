@@ -3,167 +3,158 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Примерка Ковров | Luxury Carpets</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&display=swap" rel="stylesheet">
+    <title>AI Carpet Fitting | Luxury Demo</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <style>
-        .results-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
-            margin-top: 20px;
-        }
-        .result-item {
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.3s;
-        }
-        .result-item.active {
-            border-color: var(--accent);
-        }
-        .result-item img {
-            width: 100%;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 5px;
-        }
-    </style>
 </head>
 <body>
-    <div class="container">
-        <header>
-            <h1>Виртуальная примерочная</h1>
-            <p>Загрузите фото вашей комнаты и ИИ предложит 3 варианта размещения ковра</p>
-        </header>
-
-        <section class="ai-section">
-            <div class="upload-container">
-                <h3>1. Загрузите интерьер</h3>
-                <div class="upload-zone" id="drop-zone">
-                    <div class="upload-icon">📸</div>
-                    <p>Нажмите для загрузки фото</p>
-                    <input type="file" id="file-input" style="display: none;" accept="image/*">
-                </div>
+    <div class="luxury-app">
+        <aside class="sidebar">
+            <div class="logo">
+                <h2>RUG<span>AI</span></h2>
             </div>
 
-            <div class="result-container">
-                <h3>2. Результат AI-примерки</h3>
-                <div class="preview-area" id="preview-area">
-                    <div style="padding: 2rem; text-align: center; color: #999; margin-top: 5rem;">
-                        Здесь появятся варианты после выбора ковра
+            <section class="control-panel">
+                <div class="step">
+                    <h3>1. Ваш интерьер</h3>
+                    <label for="room-upload" class="upload-btn">
+                        <span class="icon">📷</span> Загрузить фото комнаты
+                    </label>
+                    <input type="file" id="room-upload" accept="image/*" hidden>
+                </div>
+
+                <div class="step">
+                    <h3>2. Выберите ковер</h3>
+                    <div class="carpet-selection">
+                        <div class="carpet-item active" data-src="assets/carpet1.jpg">
+                            <img src="assets/carpet1.jpg" alt="Carpet 1">
+                            <span>Классика</span>
+                        </div>
+                        <div class="carpet-item" data-src="assets/carpet2.jpg">
+                            <img src="assets/carpet2.jpg" alt="Carpet 2">
+                            <span>Модерн</span>
+                        </div>
+                        <div class="carpet-item" data-src="assets/carpet3.jpg">
+                            <img src="assets/carpet3.jpg" alt="Carpet 3">
+                            <span>Премиум</span>
+                        </div>
                     </div>
                 </div>
-                <div class="loader" id="loader"></div>
-                <div class="results-grid" id="results-thumbnails"></div>
-            </div>
-        </section>
 
-        <section class="carpet-selection">
-            <h3>3. Выберите коллекцию</h3>
-            <div class="carpet-grid">
-                <div class="carpet-card" onclick="tryCarpet('classic_set', 'Классическая коллекция')">
-                    <img src="assets/carpet1.jpg" alt="Carpet 1">
-                    <div class="carpet-info">Классика</div>
+                <div class="step">
+                    <h3>3. Тонкая настройка</h3>
+                    <div class="slider-group">
+                        <label>Перспектива</label>
+                        <input type="range" id="persp" min="0" max="85" value="60">
+                    </div>
+                    <div class="slider-group">
+                        <label>Размер</label>
+                        <input type="range" id="scale" min="0.1" max="2" step="0.01" value="0.8">
+                    </div>
+                    <div class="slider-group">
+                        <label>Положение Y</label>
+                        <input type="range" id="posY" min="0" max="100" value="65">
+                    </div>
+                    <div class="slider-group">
+                        <label>Положение X</label>
+                        <input type="range" id="posX" min="0" max="100" value="50">
+                    </div>
                 </div>
-                <div class="carpet-card" onclick="tryCarpet('modern_set', 'Современная коллекция')">
-                    <img src="assets/carpet2.jpg" alt="Carpet 2">
-                    <div class="carpet-info">Модерн</div>
+
+                <button id="ai-enhance" class="ai-btn">Улучшить через ИИ ✨</button>
+            </section>
+        </aside>
+
+        <main class="viewport">
+            <div class="canvas-container" id="canvas-container">
+                <!-- Фон комнаты -->
+                <img id="room-bg" src="https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?q=80&w=1200" alt="Room">
+
+                <!-- Контейнер для ковра с перспективой -->
+                <div class="carpet-perspective-wrapper">
+                    <img id="carpet-overlay" src="assets/carpet1.jpg" alt="Carpet Overlay">
                 </div>
-                <div class="carpet-card" onclick="tryCarpet('silk_set', 'Шелковая коллекция')">
-                    <img src="https://images.unsplash.com/photo-1594051808233-e00df58e701e?q=80&w=200" alt="Carpet 3">
-                    <div class="carpet-info">Шелк</div>
+
+                <div id="loading-overlay" class="loading-overlay">
+                    <div class="spinner"></div>
+                    <p>AI обрабатывает изображение...</p>
                 </div>
             </div>
-        </section>
+
+            <div class="viewport-footer">
+                <p>Интерактивный режим: Перетаскивайте ползунки для идеального расположения</p>
+            </div>
+        </main>
     </div>
 
     <script>
-        const dropZone = document.getElementById('drop-zone');
-        const fileInput = document.getElementById('file-input');
-        const previewArea = document.getElementById('preview-area');
-        const loader = document.getElementById('loader');
-        const thumbsContainer = document.getElementById('results-thumbnails');
-        let selectedFile = null;
+        const roomUpload = document.getElementById('room-upload');
+        const roomBg = document.getElementById('room-bg');
+        const carpetOverlay = document.getElementById('carpet-overlay');
+        const carpetItems = document.querySelectorAll('.carpet-item');
 
-        dropZone.onclick = () => fileInput.click();
+        // Controls
+        const perspSlider = document.getElementById('persp');
+        const scaleSlider = document.getElementById('scale');
+        const posYSlider = document.getElementById('posY');
+        const posXSlider = document.getElementById('posX');
+        const aiBtn = document.getElementById('ai-enhance');
+        const loader = document.getElementById('loading-overlay');
 
-        fileInput.onchange = (e) => {
+        // Update Transform
+        function updateTransform() {
+            const p = perspSlider.value;
+            const s = scaleSlider.value;
+            const y = posYSlider.value;
+            const x = posXSlider.value;
+
+            // Применяем перспективу к обертке
+            const wrapper = document.querySelector('.carpet-perspective-wrapper');
+            wrapper.style.top = `${y}%`;
+            wrapper.style.left = `${x}%`;
+
+            // Применяем 3D поворот к самому ковру
+            carpetOverlay.style.transform = `translate(-50%, -50%) perspective(1000px) rotateX(${p}deg) scale(${s})`;
+        }
+
+        [perspSlider, scaleSlider, posYSlider, posXSlider].forEach(s => {
+            s.addEventListener('input', updateTransform);
+        });
+
+        // Room Upload
+        roomUpload.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file) {
-                selectedFile = file;
                 const reader = new FileReader();
-                reader.onload = (event) => {
-                    dropZone.innerHTML = `<img src="${event.target.result}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">`;
+                reader.onload = (f) => {
+                    roomBg.src = f.target.result;
                 };
                 reader.readAsDataURL(file);
             }
-        };
+        });
 
-        async function tryCarpet(carpetId, carpetName) {
-            if (!selectedFile) {
-                alert('Пожалуйста, сначала загрузите фото комнаты');
-                return;
-            }
-
-            loader.style.display = 'block';
-            thumbsContainer.innerHTML = '';
-
-            const formData = new FormData();
-            formData.append('room_image', selectedFile);
-            formData.append('carpet_id', carpetId);
-
-            try {
-                const response = await fetch('http://localhost:5000/api/process-carpet', {
-                    method: 'POST',
-                    body: formData
-                });
-                const result = await response.json();
-
-                if (result.status === 'success') {
-                    displayResults(result.variations);
-                }
-            } catch (error) {
-                console.error("API Error:", error);
-                // Fallback для демонстрации
-                displayResults([
-                    {url: 'https://images.unsplash.com/photo-1576020488411-2da6e212fa4b?q=80&w=800', desc: 'Вариант 1'},
-                    {url: 'https://images.unsplash.com/photo-1534889156217-d3c8ef81f343?q=80&w=800', desc: 'Вариант 2'},
-                    {url: 'https://images.unsplash.com/photo-1594051808233-e00df58e701e?q=80&w=800', desc: 'Вариант 3'}
-                ]);
-            } finally {
-                loader.style.display = 'none';
-            }
-        }
-
-        function displayResults(variations) {
-            thumbsContainer.innerHTML = '';
-            variations.forEach((v, index) => {
-                const thumb = document.createElement('div');
-                thumb.className = 'result-item' + (index === 0 ? ' active' : '');
-                thumb.innerHTML = `<img src="${v.url}" alt="${v.desc}">`;
-                thumb.onclick = () => {
-                    document.querySelectorAll('.result-item').forEach(el => el.classList.remove('active'));
-                    thumb.classList.add('active');
-                    updateMainPreview(v.url, v.desc);
-                };
-                thumbsContainer.appendChild(thumb);
+        // Carpet Selection
+        carpetItems.forEach(item => {
+            item.addEventListener('click', () => {
+                carpetItems.forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                carpetOverlay.src = item.dataset.src;
             });
+        });
 
-            if (variations.length > 0) {
-                updateMainPreview(variations[0].url, variations[0].desc);
-            }
-        }
+        // AI "Enhance" Simulation
+        aiBtn.addEventListener('click', async () => {
+            loader.classList.add('visible');
 
-        function updateMainPreview(url, desc) {
-            previewArea.innerHTML = `
-                <div style="position: relative; width: 100%; height: 100%;">
-                    <img src="${url}" style="width: 100%; height: 100%; object-fit: cover;">
-                    <div style="position: absolute; bottom: 10px; left: 10px; background: rgba(0,0,0,0.6); color: white; padding: 5px 12px; border-radius: 4px; font-size: 12px;">
-                        ${desc}
-                    </div>
-                </div>
-            `;
-        }
+            // Имитация работы бекенда
+            setTimeout(() => {
+                loader.classList.remove('visible');
+                alert("AI-улучшение завершено! В реальной версии здесь будет результат глубокого вписывания ковра в текстуру пола.");
+            }, 2500);
+        });
+
+        // Initial
+        updateTransform();
     </script>
 </body>
 </html>
