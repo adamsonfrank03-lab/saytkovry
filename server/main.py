@@ -13,8 +13,12 @@ try:
 except ImportError:
     HAS_VERTEX = False
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='../public', static_url_path='')
 CORS(app) # Разрешаем кросс-доменные запросы для фронтенда
+
+@app.route('/')
+def index():
+    return app.send_static_file('index.html')
 
 # Конфигурация (рекомендуется использовать env vars)
 PROJECT_ID = os.getenv("GCP_PROJECT_ID", "your-project-id")
